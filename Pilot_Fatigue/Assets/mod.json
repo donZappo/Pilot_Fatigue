@@ -1,0 +1,25 @@
+{
+    "Name": "Pilot Fatigue",
+    "Enabled": true,
+    "Version": "2.2",
+    "Description": "Adds Pilot Fatigue",
+    "Author": "don Zappo and gnivler",
+    "Website": "",
+    "Contact": "",
+	
+	"ConflictsWith": [ "No Time To Bleed" , "InjuriesHurt" ],
+
+    "DLL": "Pilot_Fatigue.dll",
+	
+	"Settings": {
+		"FatigueTimeStart" : 7,
+		"StartingMorale" : 25,
+		"FatigueMinimum" : 0,
+		"MoralePositiveTierOne" : 5,
+		"MoralePostiveTierTwo" : 15,
+		"MoraleNegativeTierOne" : -5,
+		"MoraleNegativeTierTwo" : -15,
+		"FatigueFactor" : 2.5,
+		"InjuriesHurt" : true,
+	}
+}
