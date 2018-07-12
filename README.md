@@ -3,6 +3,7 @@ Pilot Fatigue Mod for BATTLETECH
 Pilot Fatigue:
 
 ***SUMMARY***
+
 Now after every mission your pilots that participated are now fatigued. They will have decreased Gunnery, Piloting, and Tactics while fatigued. If they drop while 
 fatigued, they have a chance to suffer a "Light Injury." High Guts helps to lower their fatigue and resist light injuries. Morale also helps them to lower their
 fatigue. Treat your MechWarriors well and they'll keep fighting until the bitter end!
@@ -10,6 +11,7 @@ fatigue. Treat your MechWarriors well and they'll keep fighting until the bitter
 
 
 ***CALCULATIONS***
+
 They are out for the following time (default values used): 
 
 	-Time Out = 7 - Guts/2 - Morale threshold
@@ -20,6 +22,7 @@ They are out for the following time (default values used):
 
 
 ***ADJUSTABLE VALUES***
+
 Values that can be changed in the settings.json:
 
 	"FatigueTimeStart" : 7, 	(How many days to start the fatigue calculation at)
