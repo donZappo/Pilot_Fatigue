@@ -23,7 +23,7 @@ They are out for the following time (default values used):
 
 ***ADJUSTABLE VALUES***
 
-Values that can be changed in the settings.json:
+Values that can be changed in the mod.json:
 
 	"FatigueTimeStart" : 7, 	(How many days to start the fatigue calculation at)
 	"StartingMorale" : 25, 		(enter starting morale here for MoraleTier determinations)
