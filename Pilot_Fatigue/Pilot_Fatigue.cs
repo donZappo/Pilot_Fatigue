@@ -90,11 +90,14 @@ namespace Pilot_Fatigue
 
                 int FatigueTime = 1 + FatigueTimeStart - GutsValue / 2 - MoraleModifier;
 
+                if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic"))
+                    FatigueTime = FatigueTime - settings.pilot_athletic_FatigueDaysReduction;
+
                 if (FatigueTime <= (settings.FatigueMinimum + 1))
                 {
                     FatigueTime = settings.FatigueMinimum + 1;
                 }
-
+                
                 if (unitResult.pilot.Injuries == 0 && unitResult.pilot.pilotDef.TimeoutRemaining == 0)
                 {
                     unitResult.pilot.pilotDef.SetTimeoutTime(FatigueTime);
@@ -137,8 +140,17 @@ namespace Pilot_Fatigue
         {
             public static void Postfix(Pilot __instance, ref int __result)
             {
+                int Penalty = 0;
                 int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                int Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                if(__instance.pilotDef.PilotTags.Contains("pilot_gladiator"))
+                {
+                    Penalty = (int)Math.Floor(TimeOut / settings.FatigueFactor);
+                }
+                else
+                {
+                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                }
+                
                 if (settings.InjuriesHurt)
                 {
                     Penalty = Penalty + __instance.Injuries;
@@ -278,6 +290,7 @@ namespace Pilot_Fatigue
             public int MoraleNegativeTierTwo = -15;
             public double FatigueFactor = 2.5;
             public bool InjuriesHurt = true;
+            public int pilot_athletic_FatigueDaysReduction = 1;
         }
     }
 }
