@@ -90,7 +90,7 @@ namespace Pilot_Fatigue
 
                 int FatigueTime = 1 + FatigueTimeStart - GutsValue / 2 - MoraleModifier;
 
-                if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic"))
+                if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") && settings.QuirksEnabled)
                     FatigueTime = FatigueTime - settings.pilot_athletic_FatigueDaysReduction;
 
                 if (FatigueTime <= (settings.FatigueMinimum + 1))
@@ -142,7 +142,7 @@ namespace Pilot_Fatigue
             {
                 int Penalty = 0;
                 int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                if(__instance.pilotDef.PilotTags.Contains("pilot_gladiator"))
+                if(__instance.pilotDef.PilotTags.Contains("pilot_gladiator") && settings.QuirksEnabled)
                 {
                     Penalty = (int)Math.Floor(TimeOut / settings.FatigueFactor);
                 }
@@ -291,6 +291,7 @@ namespace Pilot_Fatigue
             public double FatigueFactor = 2.5;
             public bool InjuriesHurt = true;
             public int pilot_athletic_FatigueDaysReduction = 1;
+            public bool QuirksEnabled = false;
         }
     }
 }
