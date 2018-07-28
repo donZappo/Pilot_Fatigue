@@ -115,7 +115,7 @@ namespace Pilot_Fatigue
 
                     if (roll > GutCheck)
                     {
-                        unitResult.pilot.pilotDef.PilotTags.Add("pilot_turret_d5");
+                        unitResult.pilot.pilotDef.PilotTags.Add("pilot_companyCat");
                     }
                 }
             }
@@ -215,10 +215,12 @@ namespace Pilot_Fatigue
 			    for (int j = 0; j < list.Count; j++)
 			    {
 				    Pilot pilot = list[j];
-                    if (pilot.pilotDef.PilotTags.Contains("pilot_turret_d5"))
+                    if (pilot.pilotDef.PilotTags.Contains("pilot_companyCat"))
                     {
                         pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Int_Add, 1, -1, true);
-                        pilot.pilotDef.PilotTags.Remove("pilot_turret_d5");
+                        pilot.pilotDef.PilotTags.Remove("pilot_companyCat");
+                        int FatigueTime = pilot.pilotDef.TimeoutRemaining;
+                        pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
                     }
                     if (pilot.pilotDef.TimeoutRemaining != 0)
 				    {
