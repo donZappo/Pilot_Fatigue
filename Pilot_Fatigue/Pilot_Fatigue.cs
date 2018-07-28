@@ -106,19 +106,16 @@ namespace Pilot_Fatigue
                 {
                     float roll = UnityEngine.Random.Range(1, 100);
                     float GutCheck = 10 * GutsValue;
-                    
+                    int currenttime = unitResult.pilot.pilotDef.TimeoutRemaining;
+                    unitResult.pilot.pilotDef.SetTimeoutTime(0);
+                    WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal;
+                    workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)___simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
+                    ___simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
+                    unitResult.pilot.pilotDef.SetTimeoutTime(currenttime + FatigueTime);
+
                     if (roll > GutCheck)
                     {
-                        unitResult.pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Int_Add, 1, -1, true);
-                    }
-                    else
-                    {
-                        int currenttime = unitResult.pilot.pilotDef.TimeoutRemaining;
-                        unitResult.pilot.pilotDef.SetTimeoutTime(0);
-                        WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal;
-                        workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)___simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
-                        ___simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
-                        unitResult.pilot.pilotDef.SetTimeoutTime(currenttime + FatigueTime);
+                        unitResult.pilot.pilotDef.PilotTags.Add("pilot_turret_d5");
                     }
                 }
             }
@@ -218,12 +215,17 @@ namespace Pilot_Fatigue
 			    for (int j = 0; j < list.Count; j++)
 			    {
 				    Pilot pilot = list[j];
-				    if (pilot.pilotDef.TimeoutRemaining != 0)
+                    if (pilot.pilotDef.PilotTags.Contains("pilot_turret_d5"))
+                    {
+                        pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Int_Add, 1, -1, true);
+                        pilot.pilotDef.PilotTags.Remove("pilot_turret_d5");
+                    }
+                    if (pilot.pilotDef.TimeoutRemaining != 0)
 				    {
                         int FatigueTime = pilot.pilotDef.TimeoutRemaining;
 					    pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
 				    }
-			    }
+                }
             }
         }
 
