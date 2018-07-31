@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.IO;
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 
 namespace Pilot_Fatigue
@@ -97,7 +98,7 @@ namespace Pilot_Fatigue
                 {
                     FatigueTime = settings.FatigueMinimum + 1;
                 }
-                
+
                 if (unitResult.pilot.Injuries == 0 && unitResult.pilot.pilotDef.TimeoutRemaining == 0)
                 {
                     unitResult.pilot.pilotDef.SetTimeoutTime(FatigueTime);
@@ -140,7 +141,7 @@ namespace Pilot_Fatigue
             {
                 int Penalty = 0;
                 int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                if(__instance.pilotDef.PilotTags.Contains("pilot_gladiator") && settings.QuirksEnabled)
+                if (__instance.pilotDef.PilotTags.Contains("pilot_gladiator") && settings.QuirksEnabled)
                 {
                     Penalty = (int)Math.Floor(TimeOut / settings.FatigueFactor);
                 }
@@ -148,7 +149,7 @@ namespace Pilot_Fatigue
                 {
                     Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
                 }
-                
+
                 if (settings.InjuriesHurt)
                 {
                     Penalty = Penalty + __instance.Injuries;
@@ -205,122 +206,60 @@ namespace Pilot_Fatigue
             }
         }
 
-        [HarmonyPatch(typeof(SimGameState), "RefreshInjuries")]
-        public static class CorrectTimeOut_Prefix
-        {
-            public static bool Prefix(SimGameState __instance)
-            {
-                return false;
-            }
-        }
-
-        [HarmonyPatch(typeof(SimGameState), "RefreshInjuries")]
-        public static class CorrectTimeOut_Postfix
-        {
-            public static void Postfix(SimGameState __instance)
-            {
-                //Pilot commander = Traverse.Create(__instance).Field("commander").GetValue<Pilot>();
-                List<Pilot> list = new List<Pilot>(__instance.PilotRoster);
-                list.Add(__instance.Commander);
-                int dailyHealValue = __instance.GetDailyHealValue();
-                foreach (Pilot pilot in list)
-                {
-                    if (pilot.GetOutOfActionTime() > 0)
-                    {
-                        WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal;
-                        if (!__instance.MedBayQueue.SubEntryContainsID(pilot.Description.Id))
-                        {
-                            if (pilot.Injuries == 0 && !pilot.pilotDef.PilotTags.Contains("pilot_companyCat"))
-                            {
-                                Helper.Logger.LogLine(pilot.Callsign.ToString());
-                                Helper.Logger.LogLine("Fatigued");
-                                __instance.MedBayQueue.RemoveSubEntry(pilot.Description.Id);
-                                workOrderEntry_MedBayHeal = new WorkOrderEntry_MedBayHeal(pilot.Description.Id, string.Format("{0} fatigued.", pilot.Callsign), 
-                                    Traverse.Create(__instance).Method("GetInjuryCost", new Type[] { typeof(Pilot) }).GetValue<int>(pilot), 
-                                    pilot, __instance.MedBayQueue, string.Format(__instance.Constants.Story.MedBayWorkOrderCompletedText, pilot.Callsign));
-                                __instance.RoomManager.AddWorkQueueEntry(workOrderEntry_MedBayHeal);
-                            }
-                            else if (pilot.Injuries == 0 && pilot.pilotDef.PilotTags.Contains("pilot_companyCat"))
-                            {
-                                Helper.Logger.LogLine(pilot.Callsign.ToString());
-                                Helper.Logger.LogLine("Cat OOA");
-                                __instance.MedBayQueue.RemoveSubEntry(pilot.Description.Id);
-                                workOrderEntry_MedBayHeal = new WorkOrderEntry_MedBayHeal(pilot.Description.Id, string.Format("{0} out of action.", pilot.Callsign), 
-                                    Traverse.Create(__instance).Method("GetInjuryCost", new Type[] { typeof(Pilot) }).GetValue<int>(pilot), 
-                                    pilot, __instance.MedBayQueue, string.Format(__instance.Constants.Story.MedBayWorkOrderCompletedText, pilot.Callsign));
-                                pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Int_Add, 1, -1, true);
-                                pilot.pilotDef.PilotTags.Remove("pilot_companyCat");
-                                __instance.RoomManager.AddWorkQueueEntry(workOrderEntry_MedBayHeal);
-                            }
-                            else
-                            {
-                                Helper.Logger.LogLine(pilot.Callsign.ToString());
-                                Helper.Logger.LogLine("OOA");
-                                __instance.MedBayQueue.RemoveSubEntry(pilot.Description.Id);
-                                workOrderEntry_MedBayHeal = new WorkOrderEntry_MedBayHeal(pilot.Description.Id, string.Format("{0} out of action.", pilot.Callsign), 
-                                    Traverse.Create(__instance).Method("GetInjuryCost", new Type[] { typeof(Pilot) }).GetValue<int>(pilot), 
-                                    pilot, __instance.MedBayQueue, string.Format(__instance.Constants.Story.MedBayWorkOrderCompletedText, pilot.Callsign));
-                                __instance.RoomManager.AddWorkQueueEntry(workOrderEntry_MedBayHeal);
-                            }
-                            
-                        }
-                        else
-                        {
-                            workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)__instance.MedBayQueue.GetSubEntry(pilot.Description.Id);
-                            if (workOrderEntry_MedBayHeal.IsCostPaid())
-                            {
-                                pilot.ClearInjuries("MedBay", 0, "MedBay");
-                                pilot.pilotDef.SetTimeoutTime(0);
-                                pilot.ForceRefreshDef();
-                                __instance.RoomManager.RemoveWorkQueueEntry(workOrderEntry_MedBayHeal);
-                                __instance.MedBayQueue.RemoveSubEntry(pilot.Description.Id);
-                                __instance.LogReport(string.Format("{0} is healed from injures!", pilot.Description.Id));
-                                __instance.RefreshInjuries();
-                                return;
-                            }
-                        }
-                        TaskManagementElement workQueueEntry = __instance.RoomManager.GetWorkQueueEntry(workOrderEntry_MedBayHeal);
-                        if (workQueueEntry == null)
-                        {
-                            __instance.RoomManager.AddWorkQueueEntry(workOrderEntry_MedBayHeal);
-                        }
-                    }
-                    else if (__instance.MedBayQueue.SubEntryContainsID(pilot.Description.Id))
-                    {
-                        WorkOrderEntry_MedBayHeal entry = (WorkOrderEntry_MedBayHeal)__instance.MedBayQueue.GetSubEntry(pilot.Description.Id);
-                        __instance.RoomManager.RemoveWorkQueueEntry(entry);
-                        __instance.MedBayQueue.RemoveSubEntry(pilot.Description.Id);
-                    }
-                }
-                for (int i = __instance.MedBayQueue.SubEntryCount - 1; i >= 0; i--)
-                {
-                    WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal2 = __instance.MedBayQueue.SubEntries[i] as WorkOrderEntry_MedBayHeal;
-                    Pilot pilot2 = workOrderEntry_MedBayHeal2.Pilot;
-                    if (!list.Contains(pilot2))
-                    {
-                        __instance.RoomManager.RemoveWorkQueueEntry(workOrderEntry_MedBayHeal2);
-                        __instance.MedBayQueue.RemoveSubEntry(pilot2.Description.Id);
-                    }
-                }
-                __instance.RoomManager.RefreshTimeline();
-            }
-        }
-
         [HarmonyPatch(typeof(SimGameState), "OnDayPassed")]
         public static class CorrectTimeOut
         {
             public static void Postfix(SimGameState __instance)
-            {   
+            {
                 List<Pilot> list = new List<Pilot>(__instance.PilotRoster);
-			    list.Add(__instance.Commander);
-			    for (int j = 0; j < list.Count; j++)
-			    {
-				    Pilot pilot = list[j];
-                    if (pilot.pilotDef.TimeoutRemaining != 0)
-				    {
+                list.Add(__instance.Commander);
+                for (int j = 0; j < list.Count; j++)
+                {
+                    Pilot pilot = list[j];
+                    if (pilot.pilotDef.PilotTags.Contains("pilot_companyCat"))
+                    {
+                        pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Int_Add, 1, -1, true);
+                        pilot.pilotDef.PilotTags.Remove("pilot_companyCat");
                         int FatigueTime = pilot.pilotDef.TimeoutRemaining;
-					    pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
-				    }
+                        pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
+                    }
+                    if (pilot.pilotDef.TimeoutRemaining != 0)
+                    {
+                        int FatigueTime = pilot.pilotDef.TimeoutRemaining;
+                        pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
+                    }
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(TaskManagementElement), "UpdateTaskInfo")]
+        public static class Show_Fatigued_Info
+        {
+            public static void Postfix(TaskManagementElement __instance, TextMeshProUGUI ___subTitleText, UIColorRefTracker ___subTitleColor,
+                WorkOrderEntry ___entry)
+            {
+                WorkOrderEntry_MedBayHeal healOrder = ___entry as WorkOrderEntry_MedBayHeal;
+                try
+                {
+                    if (healOrder.Pilot.pilotDef.TimeoutRemaining > 0 && healOrder.Pilot.pilotDef.Injuries == 0 && !healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_companyCat"))
+                    {
+                        ___subTitleText.text = "FATIGUED";
+                        ___subTitleColor.SetUIColor(UIColor.Orange);
+                    }
+                }
+                catch (Exception)
+                {
+                }
+                try
+                {
+                    if (healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_companyCat"))
+                    {
+                        ___subTitleText.text = "OUT OF ACTION";
+                        ___subTitleColor.SetUIColor(UIColor.Green);
+                    }
+                }
+                catch (Exception)
+                {
                 }
             }
         }
