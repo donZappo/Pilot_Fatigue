@@ -102,6 +102,7 @@ namespace Pilot_Fatigue
                 if (unitResult.pilot.Injuries == 0 && unitResult.pilot.pilotDef.TimeoutRemaining == 0)
                 {
                     unitResult.pilot.pilotDef.SetTimeoutTime(FatigueTime);
+                    unitResult.pilot.pilotDef.PilotTags.Add("pilot_fatigued");
                 }
                 else if (unitResult.pilot.Injuries == 0 && unitResult.pilot.pilotDef.TimeoutRemaining > 0)
                 {
@@ -116,7 +117,8 @@ namespace Pilot_Fatigue
 
                     if (roll > GutCheck)
                     {
-                        unitResult.pilot.pilotDef.PilotTags.Add("pilot_companyCat");
+                        unitResult.pilot.pilotDef.PilotTags.Add("pilot_lightinjury");
+                        unitResult.pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
                     }
                 }
             }
@@ -127,7 +129,7 @@ namespace Pilot_Fatigue
         {
             private static void Postfix(Pilot __instance, ref bool __result)
             {
-                if (__instance.Injuries == 0 && __instance.pilotDef.TimeoutRemaining > 0)
+                if (__instance.Injuries == 0 && __instance.pilotDef.TimeoutRemaining > 0 && __instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
                 {
                     __result = true;
                 }
@@ -141,13 +143,16 @@ namespace Pilot_Fatigue
             {
                 int Penalty = 0;
                 int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                if (__instance.pilotDef.PilotTags.Contains("pilot_gladiator") && settings.QuirksEnabled)
+                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
                 {
-                    Penalty = (int)Math.Floor(TimeOut / settings.FatigueFactor);
-                }
-                else
-                {
-                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                    if (__instance.pilotDef.PilotTags.Contains("pilot_gladiator") && settings.QuirksEnabled)
+                    {
+                        Penalty = (int)Math.Floor(TimeOut / settings.FatigueFactor);
+                    }
+                    else
+                    {
+                        Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                    }
                 }
 
                 if (settings.InjuriesHurt)
@@ -169,7 +174,10 @@ namespace Pilot_Fatigue
             public static void Postfix(Pilot __instance, ref int __result)
             {
                 int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                int Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                int Penalty = 0;
+                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+
                 if (settings.InjuriesHurt)
                 {
                     Penalty = Penalty + __instance.Injuries;
@@ -192,7 +200,10 @@ namespace Pilot_Fatigue
             public static void Postfix(Pilot __instance, ref int __result)
             {
                 int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                int Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                int Penalty = 0;
+                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+
                 if (settings.InjuriesHurt)
                 {
                     Penalty = Penalty + __instance.Injuries;
@@ -216,10 +227,10 @@ namespace Pilot_Fatigue
                 for (int j = 0; j < list.Count; j++)
                 {
                     Pilot pilot = list[j];
-                    if (pilot.pilotDef.PilotTags.Contains("pilot_companyCat"))
+                    if (pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
                     {
                         pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Int_Add, 1, -1, true);
-                        pilot.pilotDef.PilotTags.Remove("pilot_companyCat");
+                        pilot.pilotDef.PilotTags.Remove("pilot_lightinjury");
                         int FatigueTime = pilot.pilotDef.TimeoutRemaining;
                         pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
                     }
@@ -227,6 +238,8 @@ namespace Pilot_Fatigue
                     {
                         int FatigueTime = pilot.pilotDef.TimeoutRemaining;
                         pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
+                        if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                            pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
                     }
                 }
             }
@@ -241,7 +254,8 @@ namespace Pilot_Fatigue
                 WorkOrderEntry_MedBayHeal healOrder = ___entry as WorkOrderEntry_MedBayHeal;
                 try
                 {
-                    if (healOrder.Pilot.pilotDef.TimeoutRemaining > 0 && healOrder.Pilot.pilotDef.Injuries == 0 && !healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_companyCat"))
+                    if (healOrder.Pilot.pilotDef.TimeoutRemaining > 0 && healOrder.Pilot.pilotDef.Injuries == 0
+                        && !healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_lightinjury") && healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
                     {
                         ___subTitleText.text = "FATIGUED";
                         ___subTitleColor.SetUIColor(UIColor.Orange);
@@ -252,7 +266,19 @@ namespace Pilot_Fatigue
                 }
                 try
                 {
-                    if (healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_companyCat"))
+                    if (healOrder.Pilot.pilotDef.TimeoutRemaining > 0 && healOrder.Pilot.pilotDef.Injuries == 0
+                        && !healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_lightinjury") && !healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                    {
+                        ___subTitleText.text = "UNAVAILABLE";
+                        ___subTitleColor.SetUIColor(UIColor.Blue);
+                    }
+                }
+                catch (Exception)
+                {
+                }
+                try
+                {
+                    if (healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
                     {
                         ___subTitleText.text = "OUT OF ACTION";
                         ___subTitleColor.SetUIColor(UIColor.Green);
