@@ -231,7 +231,6 @@ namespace Pilot_Fatigue
                     if (pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
                     {
                         pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Int_Add, 1, -1, true);
-                        pilot.pilotDef.PilotTags.Remove("pilot_lightinjury");
                         int FatigueTime = pilot.pilotDef.TimeoutRemaining;
                         pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
                     }
@@ -241,6 +240,9 @@ namespace Pilot_Fatigue
                         pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
                         if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
                             pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
+
+                        if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
+                            pilot.pilotDef.PilotTags.Remove("pilot_lightinjury");
                     }
                 }
             }
