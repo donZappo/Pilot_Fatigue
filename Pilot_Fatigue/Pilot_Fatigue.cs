@@ -114,6 +114,7 @@ namespace Pilot_Fatigue
                     workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)___simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
                     ___simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
                     unitResult.pilot.pilotDef.SetTimeoutTime(currenttime + FatigueTime);
+                    unitResult.pilot.pilotDef.PilotTags.Add("pilot_fatigued");
 
                     if (roll > GutCheck)
                     {
