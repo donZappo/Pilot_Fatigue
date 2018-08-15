@@ -228,21 +228,23 @@ namespace Pilot_Fatigue
                 for (int j = 0; j < list.Count; j++)
                 {
                     Pilot pilot = list[j];
-                    if (pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
+                    if (pilot.pilotDef.PilotTags.Contains("pilot_lightinjury") && pilot.pilotDef.Injuries == 0)
                     {
                         pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Int_Add, 1, -1, true);
-                        int FatigueTime = pilot.pilotDef.TimeoutRemaining;
-                        pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
                     }
                     if (pilot.pilotDef.TimeoutRemaining != 0)
                     {
                         int FatigueTime = pilot.pilotDef.TimeoutRemaining;
                         pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
+
                         if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
                             pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
 
                         if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
+                        {
                             pilot.pilotDef.PilotTags.Remove("pilot_lightinjury");
+                            pilot.StatCollection.ModifyStat<int>("Light Injury Healed", 0, "Injuries", StatCollection.StatOperation.Int_Subtract, 1, -1, true);
+                        }
                     }
                 }
             }
