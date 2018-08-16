@@ -5,7 +5,6 @@ using Harmony;
 using BattleTech.UI;
 using Newtonsoft.Json;
 using System.IO;
-using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
 
@@ -228,24 +227,25 @@ namespace Pilot_Fatigue
                 for (int j = 0; j < list.Count; j++)
                 {
                     Pilot pilot = list[j];
-                    if (pilot.pilotDef.PilotTags.Contains("pilot_lightinjury") && pilot.pilotDef.Injuries == 0)
+                    if (pilot.pilotDef.PilotTags.Contains("pilot_lightinjury") && pilot.Injuries == 0)
                     {
-                        pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Int_Add, 1, -1, true);
+                        pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Set, 1, -1, true);
                     }
                     if (pilot.pilotDef.TimeoutRemaining != 0)
                     {
                         int FatigueTime = pilot.pilotDef.TimeoutRemaining;
                         pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
-
-                        if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
-                            pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
-
-                        if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
-                        {
-                            pilot.pilotDef.PilotTags.Remove("pilot_lightinjury");
-                            pilot.StatCollection.ModifyStat<int>("Light Injury Healed", 0, "Injuries", StatCollection.StatOperation.Int_Subtract, 1, -1, true);
-                        }
                     }
+
+                    if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                        pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
+
+                    if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
+                    {
+                        pilot.pilotDef.PilotTags.Remove("pilot_lightinjury");
+                        pilot.StatCollection.ModifyStat<int>("Light Injury Healed", 0, "Injuries", StatCollection.StatOperation.Set, 0, -1, true);
+                    }
+
                 }
             }
         }
@@ -285,7 +285,7 @@ namespace Pilot_Fatigue
                 {
                     if (healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
                     {
-                        ___subTitleText.text = "OUT OF ACTION";
+                        ___subTitleText.text = "LIGHT INJURY";
                         ___subTitleColor.SetUIColor(UIColor.Green);
                     }
                 }
