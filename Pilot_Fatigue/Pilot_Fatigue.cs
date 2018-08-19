@@ -106,12 +106,12 @@ namespace Pilot_Fatigue
                 {
                     float roll = UnityEngine.Random.Range(1, 100);
                     float gutCheck = 10 * gutsValue;
-                    int currenttime = unitResult.pilot.pilotDef.TimeoutRemaining;
+                    int currentTime = unitResult.pilot.pilotDef.TimeoutRemaining;
                     unitResult.pilot.pilotDef.SetTimeoutTime(0);
                     WorkOrderEntry_MedBayHeal workOrderEntryMedBayHeal;
                     workOrderEntryMedBayHeal = (WorkOrderEntry_MedBayHeal)simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
                     simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
-                    unitResult.pilot.pilotDef.SetTimeoutTime(currenttime + fatigueTime);
+                    unitResult.pilot.pilotDef.SetTimeoutTime(currentTime + fatigueTime);
 
                     unitResult.pilot.pilotDef.PilotTags.Add(roll > gutCheck ? "pilot_lightinjury" : "pilot_fatigued");
                 }
