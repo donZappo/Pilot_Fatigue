@@ -11,12 +11,12 @@ using TMPro;
 
 namespace Pilot_Fatigue
 {
-    public static class Pre_Control
+    public static class PreControl
     {
         public const string ModName = "Pilot_Fatigue";
         public const string ModId = "dZ.Zappo.Pilot_Fatigue";
 
-        internal static ModSettings settings;
+        internal static ModSettings Settings;
         internal static string ModDirectory;
 
         public static void Init(string directory, string modSettings)
@@ -24,11 +24,11 @@ namespace Pilot_Fatigue
             ModDirectory = directory;
             try
             {
-                settings = JsonConvert.DeserializeObject<ModSettings>(modSettings);
+                Settings = JsonConvert.DeserializeObject<ModSettings>(modSettings);
             }
             catch (Exception)
             {
-                settings = new ModSettings();
+                Settings = new ModSettings();
             }
 
             var harmony = HarmonyInstance.Create(ModId);
@@ -37,97 +37,96 @@ namespace Pilot_Fatigue
 
 
         [HarmonyPatch(typeof(AAR_UnitStatusWidget), "FillInPilotData")]
-        public static class Add_Fatigue_To_Pilots_Prefix
+        public static class AddFatigueToPilotsPrefix
         {
-            public static void Prefix(AAR_UnitStatusWidget __instance, SimGameState ___simState)
+            public static void Prefix(AAR_UnitStatusWidget instance, SimGameState simState)
             {
-                UnitResult unitResult = Traverse.Create(__instance).Field("UnitData").GetValue<UnitResult>();
+                UnitResult unitResult = Traverse.Create(instance).Field("UnitData").GetValue<UnitResult>();
                 if (unitResult.pilot.pilotDef.TimeoutRemaining > 0 && unitResult.pilot.Injuries == 0)
                 {
                 }
                 else if (unitResult.pilot.pilotDef.TimeoutRemaining > 0 && unitResult.pilot.Injuries > 0)
                 {
                     unitResult.pilot.pilotDef.SetTimeoutTime(0);
-                    WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal;
-                    workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)___simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
-                    ___simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
+                    WorkOrderEntry_MedBayHeal workOrderEntryMedBayHeal;
+                    workOrderEntryMedBayHeal = (WorkOrderEntry_MedBayHeal)simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
+                    simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
                 }
 
             }
         }
 
         [HarmonyPatch(typeof(AAR_UnitStatusWidget), "FillInPilotData")]
-        public static class Add_Fatigue_To_Pilots_Postfix
+        public static class AddFatigueToPilotsPostfix
         {
-            public static void Postfix(AAR_UnitStatusWidget __instance, SimGameState ___simState)
+            public static void Postfix(AAR_UnitStatusWidget instance, SimGameState simState)
             {
-                UnitResult unitResult = Traverse.Create(__instance).Field("UnitData").GetValue<UnitResult>();
+                UnitResult unitResult = Traverse.Create(instance).Field("UnitData").GetValue<UnitResult>();
 
-                int FatigueTimeStart = settings.FatigueTimeStart;
-                int GutsValue = unitResult.pilot.Guts;
-                int TacticsValue = unitResult.pilot.Tactics;
-                SimGameState simstate = Traverse.Create(__instance).Field("simState").GetValue<SimGameState>();
-                int CurrentMorale = simstate.Morale;
-                int MoraleDiff = CurrentMorale - simstate.Morale;
-                int MoraleModifier = 0;
+                int fatigueTimeStart = Settings.FatigueTimeStart;
+                int gutsValue = unitResult.pilot.Guts;
+                SimGameState simstate = Traverse.Create(instance).Field("simState").GetValue<SimGameState>();
+                int currentMorale = simstate.Morale;
+                int moraleDiff = currentMorale - simstate.Morale;
+                int moraleModifier = 0;
 
-                if (MoraleDiff <= settings.MoraleNegativeTierTwo)
+                if (moraleDiff <= Settings.MoraleNegativeTierTwo)
                 {
-                    MoraleModifier = -2;
+                    moraleModifier = -2;
                 }
-                if (MoraleDiff <= settings.MoraleNegativeTierOne && MoraleDiff > settings.MoraleNegativeTierTwo)
+                if (moraleDiff <= Settings.MoraleNegativeTierOne && moraleDiff > Settings.MoraleNegativeTierTwo)
                 {
-                    MoraleModifier = -1;
+                    moraleModifier = -1;
                 }
-                if (MoraleDiff < settings.MoralePositiveTierTwo && MoraleDiff >= settings.MoralePositiveTierOne)
+                if (moraleDiff < Settings.MoralePositiveTierTwo && moraleDiff >= Settings.MoralePositiveTierOne)
                 {
-                    MoraleModifier = 1;
+                    moraleModifier = 1;
                 }
-                if (MoraleDiff >= settings.MoralePositiveTierTwo)
+                if (moraleDiff >= Settings.MoralePositiveTierTwo)
                 {
-                    MoraleModifier = 2;
+                    moraleModifier = 2;
                 }
 
-                int FatigueTime = 1 + FatigueTimeStart - GutsValue / 2 - MoraleModifier;
+                int fatigueTime = 1 + fatigueTimeStart - gutsValue / 2 - moraleModifier;
 
-                if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") && settings.QuirksEnabled)
-                    FatigueTime = FatigueTime - settings.pilot_athletic_FatigueDaysReduction;
+                if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") && Settings.QuirksEnabled)
+                    fatigueTime = fatigueTime - Settings.PilotAthleticFatigueDaysReduction;
 
-                if (FatigueTime <= (settings.FatigueMinimum + 1))
+                if (fatigueTime <= (Settings.FatigueMinimum + 1))
                 {
-                    FatigueTime = settings.FatigueMinimum + 1;
+                    fatigueTime = Settings.FatigueMinimum + 1;
                 }
 
                 if (unitResult.pilot.Injuries == 0 && unitResult.pilot.pilotDef.TimeoutRemaining == 0)
                 {
-                    unitResult.pilot.pilotDef.SetTimeoutTime(FatigueTime);
+                    unitResult.pilot.pilotDef.SetTimeoutTime(fatigueTime);
                     unitResult.pilot.pilotDef.PilotTags.Add("pilot_fatigued");
                 }
                 else if (unitResult.pilot.Injuries == 0 && unitResult.pilot.pilotDef.TimeoutRemaining > 0)
                 {
                     float roll = UnityEngine.Random.Range(1, 100);
-                    float GutCheck = 10 * GutsValue;
+                    float gutCheck = 10 * gutsValue;
                     int currenttime = unitResult.pilot.pilotDef.TimeoutRemaining;
                     unitResult.pilot.pilotDef.SetTimeoutTime(0);
-                    WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal;
-                    workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)___simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
-                    ___simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
-                    unitResult.pilot.pilotDef.SetTimeoutTime(currenttime + FatigueTime);
+                    WorkOrderEntry_MedBayHeal workOrderEntryMedBayHeal;
+                    workOrderEntryMedBayHeal = (WorkOrderEntry_MedBayHeal)simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
+                    simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
+                    unitResult.pilot.pilotDef.SetTimeoutTime(currenttime + fatigueTime);
 
-                    unitResult.pilot.pilotDef.PilotTags.Add(roll > GutCheck ? "pilot_lightinjury" : "pilot_fatigued");
+                    unitResult.pilot.pilotDef.PilotTags.Add(roll > gutCheck ? "pilot_lightinjury" : "pilot_fatigued");
                 }
             }
         }
 
         [HarmonyPatch(typeof(Pilot))]
         [HarmonyPatch("CanPilot", PropertyMethod.Getter)]
-        public static class BattleTech_Pilot_CanPilot_Prefix
+        public static class BattleTechPilotCanPilotPrefix
         {
-            private static void Postfix(Pilot __instance, ref bool __result)
+            private static void Postfix(Pilot instance, ref bool result)
             {
-                if (__instance.Injuries == 0 && __instance.pilotDef.TimeoutRemaining > 0 && __instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                if (instance.Injuries == 0 && instance.pilotDef.TimeoutRemaining > 0 && instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
                 {
-                    __result = true;
+                    result = true;
                 }
             }
         }
@@ -135,56 +134,56 @@ namespace Pilot_Fatigue
         [HarmonyPatch("Gunnery", PropertyMethod.Getter)]
         public class GunneryTimeModifier
         {
-            public static void Postfix(Pilot __instance, ref int __result)
+            public static void Postfix(Pilot instance, ref int result)
             {
-                int Penalty = 0;
-                int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                int penalty = 0;
+                int timeOut = instance.pilotDef.TimeoutRemaining;
+                if (instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
                 {
-                    if (__instance.pilotDef.PilotTags.Contains("pilot_gladiator") && settings.QuirksEnabled)
+                    if (instance.pilotDef.PilotTags.Contains("pilot_gladiator") && Settings.QuirksEnabled)
                     {
-                        Penalty = (int)Math.Floor(TimeOut / settings.FatigueFactor);
+                        penalty = (int)Math.Floor(timeOut / Settings.FatigueFactor);
                     }
                     else
                     {
-                        Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                        penalty = (int)Math.Ceiling(timeOut / Settings.FatigueFactor);
                     }
                 }
 
-                if (settings.InjuriesHurt)
+                if (Settings.InjuriesHurt)
                 {
-                    Penalty = Penalty + __instance.Injuries;
+                    penalty = penalty + instance.Injuries;
                 }
-                int NewValue = __result - Penalty;
-                if (NewValue < 1)
+                int newValue = result - penalty;
+                if (newValue < 1)
                 {
-                    NewValue = 1;
+                    newValue = 1;
                 }
-                __result = NewValue;
+                result = newValue;
             }
         }
         [HarmonyPatch(typeof(Pilot))]
         [HarmonyPatch("Piloting", PropertyMethod.Getter)]
         public class PilotingHealthModifier
         {
-            public static void Postfix(Pilot __instance, ref int __result)
+            public static void Postfix(Pilot instance, ref int result)
             {
-                int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                int Penalty = 0;
-                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
-                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                int timeOut = instance.pilotDef.TimeoutRemaining;
+                int penalty = 0;
+                if (instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                    penalty = (int)Math.Ceiling(timeOut / Settings.FatigueFactor);
 
-                if (settings.InjuriesHurt)
+                if (Settings.InjuriesHurt)
                 {
-                    Penalty = Penalty + __instance.Injuries;
+                    penalty = penalty + instance.Injuries;
                 }
-                int NewValue = __result - Penalty;
+                int newValue = result - penalty;
 
-                if (NewValue < 1)
+                if (newValue < 1)
                 {
-                    NewValue = 1;
+                    newValue = 1;
                 }
-                __result = NewValue;
+                result = newValue;
             }
         }
 
@@ -193,33 +192,33 @@ namespace Pilot_Fatigue
         public class TacticsHealthModifier
         {
 
-            public static void Postfix(Pilot __instance, ref int __result)
+            public static void Postfix(Pilot instance, ref int result)
             {
-                int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                int Penalty = 0;
-                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
-                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                int timeOut = instance.pilotDef.TimeoutRemaining;
+                int penalty = 0;
+                if (instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                    penalty = (int)Math.Ceiling(timeOut / Settings.FatigueFactor);
 
-                if (settings.InjuriesHurt)
+                if (Settings.InjuriesHurt)
                 {
-                    Penalty = Penalty + __instance.Injuries;
+                    penalty = penalty + instance.Injuries;
                 }
-                int NewValue = __result - Penalty;
-                if (NewValue < 1)
+                int newValue = result - penalty;
+                if (newValue < 1)
                 {
-                    NewValue = 1;
+                    newValue = 1;
                 }
-                __result = NewValue;
+                result = newValue;
             }
         }
 
         [HarmonyPatch(typeof(SimGameState), "OnDayPassed")]
         public static class CorrectTimeOut
         {
-            public static void Postfix(SimGameState __instance)
+            public static void Postfix(SimGameState instance)
             {
-                List<Pilot> list = new List<Pilot>(__instance.PilotRoster);
-                list.Add(__instance.Commander);
+                List<Pilot> list = new List<Pilot>(instance.PilotRoster);
+                list.Add(instance.Commander);
                 for (int j = 0; j < list.Count; j++)
                 {
                     Pilot pilot = list[j];
@@ -229,8 +228,8 @@ namespace Pilot_Fatigue
                     }
                     if (pilot.pilotDef.TimeoutRemaining != 0)
                     {
-                        int FatigueTime = pilot.pilotDef.TimeoutRemaining;
-                        pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
+                        int fatigueTime = pilot.pilotDef.TimeoutRemaining;
+                        pilot.pilotDef.SetTimeoutTime(fatigueTime - 1);
                     }
 
                     if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
@@ -247,19 +246,19 @@ namespace Pilot_Fatigue
         }
 
         [HarmonyPatch(typeof(TaskManagementElement), "UpdateTaskInfo")]
-        public static class Show_Fatigued_Info
+        public static class ShowFatiguedInfo
         {
-            public static void Postfix(TaskManagementElement __instance, TextMeshProUGUI ___subTitleText, UIColorRefTracker ___subTitleColor,
-                WorkOrderEntry ___entry)
+            public static void Postfix(TaskManagementElement instance, TextMeshProUGUI subTitleText, UIColorRefTracker subTitleColor,
+                WorkOrderEntry entry)
             {
-                WorkOrderEntry_MedBayHeal healOrder = ___entry as WorkOrderEntry_MedBayHeal;
+                WorkOrderEntry_MedBayHeal healOrder = entry as WorkOrderEntry_MedBayHeal;
                 try
                 {
                     if (healOrder.Pilot.pilotDef.TimeoutRemaining > 0 && healOrder.Pilot.pilotDef.Injuries == 0
                         && !healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_lightinjury") && healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
                     {
-                        ___subTitleText.text = "FATIGUED";
-                        ___subTitleColor.SetUIColor(UIColor.Orange);
+                        subTitleText.text = "FATIGUED";
+                        subTitleColor.SetUIColor(UIColor.Orange);
                     }
                 }
                 catch (Exception)
@@ -270,8 +269,8 @@ namespace Pilot_Fatigue
                     if (healOrder.Pilot.pilotDef.TimeoutRemaining > 0 && healOrder.Pilot.pilotDef.Injuries == 0
                         && !healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_lightinjury") && !healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
                     {
-                        ___subTitleText.text = "UNAVAILABLE";
-                        ___subTitleColor.SetUIColor(UIColor.Blue);
+                        subTitleText.text = "UNAVAILABLE";
+                        subTitleColor.SetUIColor(UIColor.Blue);
                     }
                 }
                 catch (Exception)
@@ -281,8 +280,8 @@ namespace Pilot_Fatigue
                 {
                     if (healOrder.Pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
                     {
-                        ___subTitleText.text = "LIGHT INJURY";
-                        ___subTitleColor.SetUIColor(UIColor.Green);
+                        subTitleText.text = "LIGHT INJURY";
+                        subTitleColor.SetUIColor(UIColor.Green);
                     }
                 }
                 catch (Exception)
@@ -355,7 +354,7 @@ namespace Pilot_Fatigue
             public int MoraleNegativeTierTwo = -15;
             public double FatigueFactor = 2.5;
             public bool InjuriesHurt = true;
-            public int pilot_athletic_FatigueDaysReduction = 1;
+            public int PilotAthleticFatigueDaysReduction = 1;
             public bool QuirksEnabled = false;
         }
     }
