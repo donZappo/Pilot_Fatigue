@@ -302,7 +302,7 @@ namespace Pilot_Fatigue
                 Settings result;
                 try
                 {
-                    using (StreamReader streamReader = new StreamReader("mods/Pilot_Fatigue/settings.json"))
+                    using (StreamReader streamReader = new StreamReader(string.Format("{0}/settings.json", ModDirectory)))
                     {
                         result = JsonConvert.DeserializeObject<Settings>(streamReader.ReadToEnd());
                     }
@@ -318,7 +318,7 @@ namespace Pilot_Fatigue
             {
                 public static void LogError(Exception ex)
                 {
-                    using (StreamWriter streamWriter = new StreamWriter("mods/Pilot_Fatigue/Log.txt", true))
+                    using (StreamWriter streamWriter = new StreamWriter(string.Format("{0}/Log.txt", ModDirectory), true))
                     {
                         streamWriter.WriteLine(string.Concat(new string[]
                         {
@@ -338,7 +338,7 @@ namespace Pilot_Fatigue
 
                 public static void LogLine(string line)
                 {
-                    string path = "mods/Pilot_Fatigue/Log.txt";
+                    string path = string.Format("{0}/Log.txt", ModDirectory);
                     using (StreamWriter streamWriter = new StreamWriter(path, true))
                     {
                         streamWriter.WriteLine(line + Environment.NewLine + "Date :" + DateTime.Now.ToString());
