@@ -113,16 +113,12 @@ namespace Pilot_Fatigue
                     workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)___simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
                     ___simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
                     unitResult.pilot.pilotDef.SetTimeoutTime(currenttime + FatigueTime);
-                    unitResult.pilot.pilotDef.PilotTags.Add("pilot_fatigued");
 
-                    if (roll > GutCheck)
-                    {
-                        unitResult.pilot.pilotDef.PilotTags.Add("pilot_lightinjury");
-                        unitResult.pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
-                    }
+                    unitResult.pilot.pilotDef.PilotTags.Add(roll > GutCheck ? "pilot_lightinjury" : "pilot_fatigued");
                 }
             }
         }
+
         [HarmonyPatch(typeof(Pilot))]
         [HarmonyPatch("CanPilot", PropertyMethod.Getter)]
         public static class BattleTech_Pilot_CanPilot_Prefix
