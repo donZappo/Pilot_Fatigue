@@ -48,6 +48,7 @@ namespace Pilot_Fatigue
                 }
                 else if (unitResult.pilot.pilotDef.TimeoutRemaining > 0 && unitResult.pilot.Injuries > 0)
                 {
+                    unitResult.pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
                     unitResult.pilot.pilotDef.SetTimeoutTime(0);
                     WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal;
                     workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)___simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
@@ -124,6 +125,22 @@ namespace Pilot_Fatigue
                 }
             }
         }
+
+        [HarmonyPatch(typeof(SimGameState))]
+        [HarmonyPatch("GetInjuryCost")]
+        public static class GetInjuryCost_Postfix
+        {
+            private static void Postfix(SimGameState __instance, Pilot p, ref int __result)
+            {
+                if (p.pilotDef.PilotTags.Contains("pilot_fatigued") || p.pilotDef.PilotTags.Contains("pilot_lightinjury"))
+                {
+                    __result = p.pilotDef.TimeoutRemaining;
+                }
+            }
+        }
+
+
+
         [HarmonyPatch(typeof(Pilot))]
         [HarmonyPatch("CanPilot", PropertyMethod.Getter)]
         public static class BattleTech_Pilot_CanPilot_Prefix
