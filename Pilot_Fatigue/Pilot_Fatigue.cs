@@ -125,18 +125,18 @@ namespace Pilot_Fatigue
             }
         }
 
-        [HarmonyPatch(typeof(SimGameState))]
-        [HarmonyPatch("GetInjuryCost")]
-        public static class GetInjuryCost_Postfix
-        {
-            private static void Postfix(SimGameState __instance, Pilot p, ref int __result)
-            {
-                if (p.pilotDef.PilotTags.Contains("pilot_fatigued") || p.pilotDef.PilotTags.Contains("pilot_lightinjury"))
-                {
-                    __result = p.pilotDef.TimeoutRemaining;
-                }
-            }
-        }
+        //[HarmonyPatch(typeof(SimGameState))]
+        //[HarmonyPatch("GetInjuryCost")]
+        //public static class GetInjuryCost_Postfix
+        //{
+        //    private static void Postfix(SimGameState __instance, Pilot p, ref int __result)
+        //    {
+        //        if (p.pilotDef.PilotTags.Contains("pilot_fatigued") | p.pilotDef.PilotTags.Contains("pilot_lightinjury") && p.pilotDef.TimeoutRemaining != 0)
+        //        {
+        //            __result = p.pilotDef.TimeoutRemaining;
+        //        }
+        //    }
+        //}
 
 
 
