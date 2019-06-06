@@ -4,9 +4,7 @@ Pilot Fatigue:
 
 ***SUMMARY***
 
-Now after every mission your pilots that participated are now fatigued. They will have decreased Gunnery, Piloting, and Tactics while fatigued. If they drop while 
-fatigued, they have a chance to suffer a "Light Injury." High Guts helps to lower their fatigue and resist light injuries. Morale also helps them to lower their
-fatigue. Treat your MechWarriors well and they'll keep fighting until the bitter end!
+Now after every mission your pilots that participated are now fatigued. They will generate less Resolve and also suffer from Low Spirits if they drop while Fatigued. In addition, if they drop while fatigued, they have a chance to suffer a "Light Injury." High Guts helps to lower their fatigue and resist light injuries. Morale also helps them to lower theirfatigue. Treat your MechWarriors well and they'll keep fighting until the bitter end!
 
 
 
@@ -25,15 +23,20 @@ They are out for the following time (default values used):
 
 Values that can be changed in the mod.json:
 
-	"FatigueTimeStart" : 7, 	(How many days to start the fatigue calculation at)
-	"StartingMorale" : 25, 		(enter starting morale here for MoraleTier determinations)
-	"FatigueMinimum" : 0, 		(minimum days that a pilot will be fatigued for after a mission)
-	"MoralePositiveTierOne" : 5, 	(Positive difference from StartingMorale to reduce fatigue by 1 day)
-	"MoralePostiveTierTwo" : 15, 	(Positive difference from StartingMorale to reduce fatigue by 2 day)
-	"MoraleNegativeTierOne" : -5, 	(Negative difference from StartingMorale to increase fatigue by 1 day)
-	"MoraleNegativeTierTwo" : -15, 	(Negative difference from StartingMorale to increase fatigue by 2 day)
-	"FatigueFactor" : 3,		(For skill degradation with fatigue, how many days is used in the calculation)
-	"InjuriesHurt" : true, 		(makes your skills degrade one point per pilot injury)
+	"FatigueTimeStart" : 7, 		(How many days to start the fatigue calculation at)
+	"StartingMorale" : 25, 			(enter starting morale here for MoraleTier determinations)
+	"FatigueMinimum" : 0, 			(minimum days that a pilot will be fatigued for after a mission)
+	"MoralePositiveTierOne" : 5, 		(Positive difference from StartingMorale to reduce fatigue by 1 day)
+	"MoralePostiveTierTwo" : 15, 		(Positive difference from StartingMorale to reduce fatigue by 2 day)
+	"MoraleNegativeTierOne" : -5, 		(Negative difference from StartingMorale to increase fatigue by 1 day)
+	"MoraleNegativeTierTwo" : -15, 		(Negative difference from StartingMorale to increase fatigue by 2 day)
+	"FatigueFactor" : 2.5,			(For skill degradation with fatigue, how many days is used in the calculation)
+	"InjuriesHurt" : false, 		(makes your skills degrade one point per pilot injury)
+	"FatigueReducesResolve" : true,		Does Fatigue reduce Resolve?
+	"FatigueReducesSkills" : false,		Does Fatigue reduce Skills?
+	"FatigueResolveFactor" : 2.5,		Same as with the FatigueFactor but for Resolve.
+	"FatigueCausesLowSpirites: true,	Does dropping while Fatigued cause Low Spirits?
+	"LowMoraleTime" : 14,			How long does Low Spirits last if you drop while Fatigued?
 
 
 
