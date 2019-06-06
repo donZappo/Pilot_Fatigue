@@ -148,7 +148,7 @@ namespace Pilot_Fatigue
         [HarmonyPatch("CanPilot", MethodType.Getter)]
         public static class BattleTech_Pilot_CanPilot_Prefix
         {
-            private static void Postfix(Pilot __instance, ref bool __result)
+            public static void Postfix(Pilot __instance, ref bool __result)
             {
                 if (__instance.Injuries == 0 && __instance.pilotDef.TimeoutRemaining > 0 && __instance.pilotDef.PilotTags.Contains("pilot_fatigued"))
                 {
@@ -342,7 +342,7 @@ namespace Pilot_Fatigue
         [HarmonyPatch(typeof(Team), "CollectUnitBaseline")]
         public static class Resolve_Reduction_Patch
         {
-            private static void Postfix(Team __instance, ref int __result)
+            public static void Postfix(Team __instance, ref int __result)
             {
                 if (settings.FatigueReducesResolve == true)
                 {
@@ -374,7 +374,7 @@ namespace Pilot_Fatigue
         [HarmonyPatch(typeof(TurnEventNotification), "ShowTeamNotification")]
         public static class TurnEventNotification_Patch
         {
-            private static void Prefix(TurnEventNotification __instance, Team team, bool ___hasBegunGame, 
+            public static void Prefix(TurnEventNotification __instance, Team team, bool ___hasBegunGame, 
                 CombatGameState ___Combat)
             {
                 if (settings.FatigueCausesLowSpirits)
@@ -394,7 +394,6 @@ namespace Pilot_Fatigue
                 }
             }
         }
-
 
         public static class Helper
         {
