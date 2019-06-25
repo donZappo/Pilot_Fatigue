@@ -69,8 +69,7 @@ namespace Pilot_Fatigue
                 int GutsValue = unitResult.pilot.Guts;
                 int TacticsValue = unitResult.pilot.Tactics;
                 SimGameState simstate = Traverse.Create(__instance).Field("simState").GetValue<SimGameState>();
-                int CurrentMorale = simstate.Morale;
-                int MoraleDiff = CurrentMorale - simstate.Morale;
+                int MoraleDiff = simstate.Morale - settings.StartingMorale;
                 int MoraleModifier = 0;
 
                 if (MoraleDiff <= settings.MoraleNegativeTierTwo)
@@ -90,7 +89,7 @@ namespace Pilot_Fatigue
                     MoraleModifier = 2;
                 }
 
-                int FatigueTime = 1 + FatigueTimeStart - GutsValue / 2 - MoraleModifier;
+                int FatigueTime = FatigueTimeStart - GutsValue / 2 - MoraleModifier;
 
                 if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") && settings.QuirksEnabled)
                     FatigueTime = (int)((float)FatigueTime/settings.pilot_athletic_FatigueDaysReductionFactor) - settings.pilot_athletic_FatigueDaysReduction;
