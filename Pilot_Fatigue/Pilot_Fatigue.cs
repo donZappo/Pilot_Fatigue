@@ -116,7 +116,10 @@ namespace Pilot_Fatigue
                     WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal;
                     workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)___simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
                     ___simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
-                    unitResult.pilot.pilotDef.SetTimeoutTime(currenttime + FatigueTime);
+                    int TotalFatigueTime = currenttime + FatigueTime;
+                    if (TotalFatigueTime > settings.MaximumFatigueTime)
+                        TotalFatigueTime = settings.MaximumFatigueTime;
+                    unitResult.pilot.pilotDef.SetTimeoutTime(TotalFatigueTime);
                     unitResult.pilot.pilotDef.PilotTags.Add("pilot_fatigued");
 
                     if (roll > GutCheck && settings.LightInjuriesOn)
@@ -467,6 +470,7 @@ namespace Pilot_Fatigue
             public bool FatigueCausesLowSpirits = true;
             public int LowMoraleTime = 14;
             public bool LightInjuriesOn = true;
+            public int MaximumFatigueTime = 14;
         }
     }
 }
