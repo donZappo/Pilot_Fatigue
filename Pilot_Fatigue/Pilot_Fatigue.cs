@@ -120,7 +120,7 @@ namespace Pilot_Fatigue
                     unitResult.pilot.pilotDef.SetTimeoutTime(currenttime + FatigueTime);
                     unitResult.pilot.pilotDef.PilotTags.Add("pilot_fatigued");
 
-                    if (roll > GutCheck)
+                    if (roll > GutCheck && settings.LightInjuriesOn)
                     {
                         unitResult.pilot.pilotDef.PilotTags.Add("pilot_lightinjury");
                         unitResult.pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
@@ -467,6 +467,7 @@ namespace Pilot_Fatigue
             public double FatigueResolveFactor = 2.5;
             public bool FatigueCausesLowSpirits = true;
             public int LowMoraleTime = 14;
+            public bool LightInjuriesOn = true;
         }
     }
 }
