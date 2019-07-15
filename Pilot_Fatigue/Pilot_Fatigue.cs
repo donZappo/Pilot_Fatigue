@@ -365,6 +365,8 @@ namespace Pilot_Fatigue
                                 Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueResolveFactor);
                             }
                             __result = __result - Penalty;
+                            if (settings.AllowNegativeResolve && __result < 0)
+                                __result = 0;
                         }
                     }
                 }
@@ -471,6 +473,7 @@ namespace Pilot_Fatigue
             public int LowMoraleTime = 14;
             public bool LightInjuriesOn = true;
             public int MaximumFatigueTime = 14;
+            public bool AllowNegativeResolve = false;
         }
     }
 }
