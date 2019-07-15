@@ -37,6 +37,9 @@ Values that can be changed in the mod.json:
 	"FatigueResolveFactor" : 2.5,		Same as with the FatigueFactor but for Resolve.
 	"FatigueCausesLowSpirites: true,	Does dropping while Fatigued cause Low Spirits?
 	"LowMoraleTime" : 14,			How long does Low Spirits last if you drop while Fatigued?
+	"LightInjuriesOn" : false,		Allow light injuries? 
+	"MaximumFatigueTime" : 14,		Maximum fatigue days allowed per pilot.
+	"AllowNegativeResolve" : false		Is resolve per turn allowed to go negative?
 
 
 
