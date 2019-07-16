@@ -71,7 +71,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "$(SolutionDir)\Release\$(TargetName)\" /Y
-xcopy "$(ProjectDir)\Assets\mod.json" "$(SolutionDir)\Release\$(TargetName)\" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\BATTLETECH\Mods\Pilot_Fatigue" /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>

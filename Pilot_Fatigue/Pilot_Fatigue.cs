@@ -94,9 +94,9 @@ namespace Pilot_Fatigue
                 if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") && settings.QuirksEnabled)
                     FatigueTime = (int)((float)FatigueTime/settings.pilot_athletic_FatigueDaysReductionFactor) - settings.pilot_athletic_FatigueDaysReduction;
 
-                if (FatigueTime <= (settings.FatigueMinimum + 1))
+                if (FatigueTime < settings.FatigueMinimum)
                 {
-                    FatigueTime = settings.FatigueMinimum + 1;
+                    FatigueTime = settings.FatigueMinimum;
                 }
 
                 if (unitResult.pilot.Injuries == 0 && unitResult.pilot.pilotDef.TimeoutRemaining == 0)
