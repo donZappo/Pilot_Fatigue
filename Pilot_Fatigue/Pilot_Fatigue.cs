@@ -99,6 +99,9 @@ namespace Pilot_Fatigue
                     FatigueTime = settings.FatigueMinimum;
                 }
 
+                if (settings.QuirksEnabled && unitResult.pilot.pilotDef.PilotTags.Contains("pilot_wealthy"))
+                    FatigueTime += settings.pilot_wealthy_extra_fatigue;
+
                 if (unitResult.pilot.Injuries == 0 && unitResult.pilot.pilotDef.TimeoutRemaining == 0)
                 {
                     unitResult.pilot.pilotDef.SetTimeoutTime(FatigueTime);
@@ -117,7 +120,7 @@ namespace Pilot_Fatigue
                     workOrderEntry_MedBayHeal = (WorkOrderEntry_MedBayHeal)___simState.MedBayQueue.GetSubEntry(unitResult.pilot.Description.Id);
                     ___simState.MedBayQueue.RemoveSubEntry(unitResult.pilot.Description.Id);
                     int TotalFatigueTime = currenttime + FatigueTime;
-                    if (TotalFatigueTime > settings.MaximumFatigueTime)
+                    if (TotalFatigueTime > settings.MaximumFatigueTime && !(settings.QuirksEnabled && unitResult.pilot.pilotDef.PilotTags.Contains("pilot_wealthy")))
                         TotalFatigueTime = settings.MaximumFatigueTime;
                     unitResult.pilot.pilotDef.SetTimeoutTime(TotalFatigueTime);
                     unitResult.pilot.pilotDef.PilotTags.Add("pilot_fatigued");
@@ -474,6 +477,7 @@ namespace Pilot_Fatigue
             public bool LightInjuriesOn = true;
             public int MaximumFatigueTime = 14;
             public bool AllowNegativeResolve = false;
+            public int pilot_wealthy_extra_fatigue = 1;
         }
     }
 }
