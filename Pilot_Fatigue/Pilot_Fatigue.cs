@@ -368,7 +368,7 @@ namespace Pilot_Fatigue
                                 Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueResolveFactor);
                             }
                             __result = __result - Penalty;
-                            if (settings.AllowNegativeResolve && __result < 0)
+                            if (!settings.AllowNegativeResolve && __result < 0)
                                 __result = 0;
                         }
                     }
