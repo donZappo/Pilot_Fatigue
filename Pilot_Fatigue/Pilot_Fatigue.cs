@@ -125,7 +125,7 @@ namespace Pilot_Fatigue
                     unitResult.pilot.pilotDef.SetTimeoutTime(TotalFatigueTime);
                     unitResult.pilot.pilotDef.PilotTags.Add("pilot_fatigued");
 
-                    if (roll > GutCheck && settings.LightInjuriesOn)
+                    if (roll > GutCheck && (settings.LightInjuriesOn || simstate.Constants.Story.MaximumDebt == 42))
                     {
                         unitResult.pilot.pilotDef.PilotTags.Add("pilot_lightinjury");
                         unitResult.pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
