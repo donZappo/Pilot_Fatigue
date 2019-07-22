@@ -69,7 +69,7 @@ namespace Pilot_Fatigue
                 int GutsValue = unitResult.pilot.Guts;
                 int TacticsValue = unitResult.pilot.Tactics;
                 SimGameState simstate = Traverse.Create(__instance).Field("simState").GetValue<SimGameState>();
-                int MoraleDiff = simstate.Morale - settings.StartingMorale;
+                int MoraleDiff = simstate.Morale - simstate.Constants.Story.StartingMorale;
                 int MoraleModifier = 0;
 
                 if (MoraleDiff <= settings.MoraleNegativeTierTwo)
@@ -458,7 +458,6 @@ namespace Pilot_Fatigue
         {
             public int FatigueTimeStart = 7;
             public int MoraleModifier = 5;
-            public int StartingMorale = 25;
             public int FatigueMinimum = 0;
             public int MoralePositiveTierOne = 5;
             public int MoralePositiveTierTwo = 15;
