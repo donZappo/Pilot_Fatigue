@@ -91,7 +91,7 @@ namespace Pilot_Fatigue
 
                 int FatigueTime = FatigueTimeStart - GutsValue / 2 - MoraleModifier;
 
-                if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") && settings.QuirksEnabled)
+                if ((unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") || unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green")) && settings.QuirksEnabled)
                     FatigueTime = (int)((float)FatigueTime/settings.pilot_athletic_FatigueDaysReductionFactor) - settings.pilot_athletic_FatigueDaysReduction;
 
                 if (FatigueTime < settings.FatigueMinimum)
@@ -111,7 +111,7 @@ namespace Pilot_Fatigue
                 {
                     float roll = UnityEngine.Random.Range(1, 100);
                     float GutCheck = 10 * GutsValue;
-                    if (settings.QuirksEnabled && unitResult.pilot.pilotDef.PilotTags.Contains("pilot_gladiator"))
+                    if (settings.QuirksEnabled && (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_gladiator") || unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green")))
                         GutCheck = GutCheck + 20;
 
                     int currenttime = unitResult.pilot.pilotDef.TimeoutRemaining;
@@ -131,6 +131,8 @@ namespace Pilot_Fatigue
                         unitResult.pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
                     }
                 }
+                if (unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green"))
+                    unitResult.pilot.pilotDef.PilotTags.Remove("PQ_pilot_green");
             }
         }
 
