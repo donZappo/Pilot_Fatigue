@@ -89,7 +89,23 @@ namespace Pilot_Fatigue
                     MoraleModifier = 2;
                 }
 
-                int FatigueTime = FatigueTimeStart - GutsValue / 2 - MoraleModifier;
+                //Reduction in Fatigue Time for Guts tiers.
+                int GutsReduction = 0;
+                if (GutsValue >= 4)
+                    GutsReduction = 1;
+                if (GutsValue >= 7)
+                    GutsReduction = 2;
+                else if (GutsValue == 10)
+                    GutsReduction = 3;
+
+                //Additional Fatigue Time for 'Mech damage.
+                double MechDamage = (unitResult.mech.MechDefCurrentStructure + unitResult.mech.MechDefCurrentArmor) /
+                    (unitResult.mech.MechDefAssignedArmor + unitResult.mech.MechDefMaxStructure);
+
+                int MechDamageTime = (int)MechDamage * settings.MechDamageMaxDays;
+
+                //Calculate actual Fatigue Time for pilot.
+                int FatigueTime = FatigueTimeStart + MechDamageTime - GutsReduction - MoraleModifier;
 
                 if ((unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") || unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green")) && settings.QuirksEnabled)
                     FatigueTime = (int)((float)FatigueTime/settings.pilot_athletic_FatigueDaysReductionFactor) - settings.pilot_athletic_FatigueDaysReduction;
@@ -479,6 +495,7 @@ namespace Pilot_Fatigue
             public int MaximumFatigueTime = 14;
             public bool AllowNegativeResolve = false;
             public int pilot_wealthy_extra_fatigue = 1;
+            public int MechDamageMaxDays = 5;
         }
     }
 }
