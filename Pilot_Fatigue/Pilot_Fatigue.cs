@@ -102,7 +102,7 @@ namespace Pilot_Fatigue
                 double MechDamage = (unitResult.mech.MechDefCurrentStructure + unitResult.mech.MechDefCurrentArmor) /
                     (unitResult.mech.MechDefAssignedArmor + unitResult.mech.MechDefMaxStructure);
 
-                int MechDamageTime = (int)MechDamage * settings.MechDamageMaxDays;
+                int MechDamageTime = (int)(1 - MechDamage) * settings.MechDamageMaxDays;
 
                 //Calculate actual Fatigue Time for pilot.
                 int FatigueTime = FatigueTimeStart + MechDamageTime - GutsReduction - MoraleModifier;
