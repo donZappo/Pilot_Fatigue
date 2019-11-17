@@ -422,23 +422,23 @@ namespace Pilot_Fatigue
 
         public static class Helper
         {
-            public static Settings LoadSettings()
-            {
-                Settings result;
-                try
-                {
-                    using (StreamReader streamReader = new StreamReader("mods/Pilot_Fatigue/settings.json"))
-                    {
-                        result = JsonConvert.DeserializeObject<Settings>(streamReader.ReadToEnd());
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex);
-                    result = null;
-                }
-                return result;
-            }
+            //public static Settings LoadSettings()
+            //{
+            //    Settings result;
+            //    try
+            //    {
+            //        using (StreamReader streamReader = new StreamReader("mods/Pilot_Fatigue/settings.json"))
+            //        {
+            //            result = JsonConvert.DeserializeObject<Settings>(streamReader.ReadToEnd());
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Logger.LogError(ex);
+            //        result = null;
+            //    }
+            //    return result;
+            //}
             public class Logger
             {
                 public static void LogError(Exception ex)
