@@ -8,6 +8,7 @@ using System.IO;
 using System.Collections.Generic;
 using TMPro;
 using HBS.Collections;
+using HBS.Extensions;
 
 
 namespace Pilot_Fatigue
@@ -48,6 +49,7 @@ namespace Pilot_Fatigue
                 }
                 else if (unitResult.pilot.pilotDef.TimeoutRemaining > 0 && unitResult.pilot.Injuries > 0)
                 {
+                    Helper.Logger.LogLine("Here");
                     unitResult.pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
                     unitResult.pilot.pilotDef.SetTimeoutTime(0);
                     WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal;
@@ -179,87 +181,7 @@ namespace Pilot_Fatigue
                 }
             }
         }
-        [HarmonyPatch(typeof(Pilot))]
-        [HarmonyPatch("Gunnery", MethodType.Getter)]
-        public class GunneryTimeModifier
-        {
-            public static void Postfix(Pilot __instance, ref int __result)
-            {
-                int Penalty = 0;
-                int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued") && settings.FatigueReducesSkills)
-                {
-                    if (__instance.pilotDef.PilotTags.Contains("pilot_gladiator") && settings.QuirksEnabled)
-                    {
-                        Penalty = (int)Math.Floor(TimeOut / settings.FatigueFactor);
-                    }
-                    else
-                    {
-                        Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
-                    }
-                }
-
-                if (settings.InjuriesHurt)
-                {
-                    Penalty = Penalty + __instance.Injuries;
-                }
-                int NewValue = __result - Penalty;
-                if (NewValue < 1)
-                {
-                    NewValue = 1;
-                }
-                __result = NewValue;
-            }
-        }
-        [HarmonyPatch(typeof(Pilot))]
-        [HarmonyPatch("Piloting", MethodType.Getter)]
-        public class PilotingHealthModifier
-        {
-            public static void Postfix(Pilot __instance, ref int __result)
-            {
-                int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                int Penalty = 0;
-                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued") && settings.FatigueReducesSkills)
-                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
-
-                if (settings.InjuriesHurt)
-                {
-                    Penalty = Penalty + __instance.Injuries;
-                }
-                int NewValue = __result - Penalty;
-
-                if (NewValue < 1)
-                {
-                    NewValue = 1;
-                }
-                __result = NewValue;
-            }
-        }
-
-        [HarmonyPatch(typeof(Pilot))]
-        [HarmonyPatch("Tactics", MethodType.Getter)]
-        public class TacticsHealthModifier
-        {
-
-            public static void Postfix(Pilot __instance, ref int __result)
-            {
-                int TimeOut = __instance.pilotDef.TimeoutRemaining;
-                int Penalty = 0;
-                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued") && settings.FatigueReducesSkills)
-                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
-
-                if (settings.InjuriesHurt)
-                {
-                    Penalty = Penalty + __instance.Injuries;
-                }
-                int NewValue = __result - Penalty;
-                if (NewValue < 1)
-                {
-                    NewValue = 1;
-                }
-                __result = NewValue;
-            }
-        }
+        
 
         [HarmonyPatch(typeof(SimGameState), "OnDayPassed")]
         public static class CorrectTimeOut
@@ -275,14 +197,16 @@ namespace Pilot_Fatigue
                     {
                         pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Set, 1, -1, true);
                     }
-                    if (pilot.pilotDef.TimeoutRemaining != 0)
-                    {
-                        int FatigueTime = pilot.pilotDef.TimeoutRemaining;
-                        pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
-                    }
+//                    if (pilot.pilotDef.TimeoutRemaining != 0)
+//                    {
+//                        int FatigueTime = pilot.pilotDef.TimeoutRemaining;
+//                        pilot.pilotDef.SetTimeoutTime(FatigueTime - 1);
+//                    }
 
                     if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                    {
                         pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
+                    }
 
                     if (pilot.pilotDef.TimeoutRemaining == 0 && pilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))
                     {
@@ -420,6 +344,88 @@ namespace Pilot_Fatigue
             }
         }
 
+        [HarmonyPatch(typeof(Pilot))]
+        [HarmonyPatch("Gunnery", MethodType.Getter)]
+        public class GunneryTimeModifier
+        {
+            public static void Postfix(Pilot __instance, ref int __result)
+            {
+                int Penalty = 0;
+                int TimeOut = __instance.pilotDef.TimeoutRemaining;
+                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued") && settings.FatigueReducesSkills)
+                {
+                    if (__instance.pilotDef.PilotTags.Contains("pilot_gladiator") && settings.QuirksEnabled)
+                    {
+                        Penalty = (int)Math.Floor(TimeOut / settings.FatigueFactor);
+                    }
+                    else
+                    {
+                        Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+                    }
+                }
+
+                if (settings.InjuriesHurt)
+                {
+                    Penalty = Penalty + __instance.Injuries;
+                }
+                int NewValue = __result - Penalty;
+                if (NewValue < 1)
+                {
+                    NewValue = 1;
+                }
+                __result = NewValue;
+            }
+        }
+        [HarmonyPatch(typeof(Pilot))]
+        [HarmonyPatch("Piloting", MethodType.Getter)]
+        public class PilotingHealthModifier
+        {
+            public static void Postfix(Pilot __instance, ref int __result)
+            {
+                int TimeOut = __instance.pilotDef.TimeoutRemaining;
+                int Penalty = 0;
+                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued") && settings.FatigueReducesSkills)
+                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+
+                if (settings.InjuriesHurt)
+                {
+                    Penalty = Penalty + __instance.Injuries;
+                }
+                int NewValue = __result - Penalty;
+
+                if (NewValue < 1)
+                {
+                    NewValue = 1;
+                }
+                __result = NewValue;
+            }
+        }
+
+        [HarmonyPatch(typeof(Pilot))]
+        [HarmonyPatch("Tactics", MethodType.Getter)]
+        public class TacticsHealthModifier
+        {
+
+            public static void Postfix(Pilot __instance, ref int __result)
+            {
+                int TimeOut = __instance.pilotDef.TimeoutRemaining;
+                int Penalty = 0;
+                if (__instance.pilotDef.PilotTags.Contains("pilot_fatigued") && settings.FatigueReducesSkills)
+                    Penalty = (int)Math.Ceiling(TimeOut / settings.FatigueFactor);
+
+                if (settings.InjuriesHurt)
+                {
+                    Penalty = Penalty + __instance.Injuries;
+                }
+                int NewValue = __result - Penalty;
+                if (NewValue < 1)
+                {
+                    NewValue = 1;
+                }
+                __result = NewValue;
+            }
+        }
+        
         public static class Helper
         {
             //public static Settings LoadSettings()
