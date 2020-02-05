@@ -195,7 +195,7 @@ namespace Pilot_Fatigue
                     Pilot pilot = list[j];
                     if (pilot.pilotDef.PilotTags.Contains("pilot_lightinjury") && pilot.Injuries == 0)
                     {
-                        pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Set, 1, -1, true);
+                        //pilot.StatCollection.ModifyStat<int>("Light Injury", 0, "Injuries", StatCollection.StatOperation.Set, 1, -1, true);
                     }
 //                    if (pilot.pilotDef.TimeoutRemaining != 0)
 //                    {
