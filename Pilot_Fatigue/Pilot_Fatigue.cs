@@ -6,9 +6,11 @@ using BattleTech.UI;
 using Newtonsoft.Json;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using HBS.Collections;
 using HBS.Extensions;
+using UnityEngine;
 
 
 namespace Pilot_Fatigue
@@ -37,6 +39,25 @@ namespace Pilot_Fatigue
             harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
 
+        [HarmonyPatch(typeof(SGBarracksRosterList), "SetSorting")]
+        public static class SGBarracksRosterList_SetSorting_Patch
+        {
+            public static void Postfix(SGBarracksRosterList __instance, Dictionary<string, SGBarracksRosterSlot> ___currentRoster)
+            {
+                foreach (var pilot in ___currentRoster.Values)
+                {
+                    var timeoutIcon = pilot.GetComponentsInChildren<RectTransform>(true)
+                        .FirstOrDefault(x => x.name == "mw_TimeOutIcon");
+                    if (timeoutIcon != null)
+                    {
+                        timeoutIcon.sizeDelta /= 2;
+                        timeoutIcon.anchoredPosition += new Vector2(6f, 35f);
+                    }
+                }
+
+                __instance.ForceRefreshImmediate();
+            }
+        }
 
         [HarmonyPatch(typeof(AAR_UnitStatusWidget), "FillInPilotData")]
         public static class Add_Fatigue_To_Pilots_Prefix
