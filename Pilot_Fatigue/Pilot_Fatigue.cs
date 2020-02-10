@@ -161,6 +161,7 @@ namespace Pilot_Fatigue
             }
         }
 
+
         //[HarmonyPatch(typeof(SimGameState))]
         //[HarmonyPatch("GetInjuryCost")]
         //public static class GetInjuryCost_Postfix

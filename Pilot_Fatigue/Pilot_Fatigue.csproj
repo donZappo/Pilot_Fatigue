@@ -84,6 +84,6 @@
   <PropertyGroup>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "D:\Users\Bradley T. Burcar\Source\Repos\XLRP\Build\XLRP\1.8\Pilot_Fatigue" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "D:\Users\Bradley T. Burcar\Source\Repos\XLRP-Complete\Pilot_Fatigue" /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
