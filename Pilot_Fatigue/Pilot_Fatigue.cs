@@ -125,13 +125,16 @@ namespace Pilot_Fatigue
                 double MechDamage = (unitResult.mech.MechDefCurrentStructure + unitResult.mech.MechDefCurrentArmor) /
                     (unitResult.mech.MechDefAssignedArmor + unitResult.mech.MechDefMaxStructure);
 
-                int MechDamageTime = (int)(1 - MechDamage) * settings.MechDamageMaxDays;
+                int MechDamageTime = (int)Math.Ceiling((1 - MechDamage) * settings.MechDamageMaxDays);
 
                 //Calculate actual Fatigue Time for pilot.
                 int FatigueTime = FatigueTimeStart + MechDamageTime - GutsReduction - MoraleModifier;
 
-                if ((unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") || unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green")) && settings.QuirksEnabled)
-                    FatigueTime = (int)((float)FatigueTime/settings.pilot_athletic_FatigueDaysReductionFactor) - settings.pilot_athletic_FatigueDaysReduction;
+                if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") && settings.QuirksEnabled)
+                    FatigueTime = (int)Math.Ceiling(FatigueTime/settings.pilot_athletic_FatigueDaysReductionFactor) - settings.pilot_athletic_FatigueDaysReduction;
+
+                if (unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green"))
+                    FatigueTime -= settings.pilot_athletic_FatigueDaysReduction;
 
                 if (FatigueTime < settings.FatigueMinimum)
                 {
@@ -149,9 +152,13 @@ namespace Pilot_Fatigue
                 else if (unitResult.pilot.Injuries == 0 && unitResult.pilot.pilotDef.TimeoutRemaining > 0)
                 {
                     float roll = UnityEngine.Random.Range(1, 100);
-                    float GutCheck = 10 * GutsValue;
+                    float GutCheck = 5 * GutsValue;
                     if (settings.QuirksEnabled && (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_gladiator") || unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green")))
-                        GutCheck = GutCheck + 20;
+                        GutCheck = GutCheck + 25;
+                    if (unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green"))
+                        GutCheck = GutCheck + 25;
+
+
 
                     int currenttime = unitResult.pilot.pilotDef.TimeoutRemaining;
                     unitResult.pilot.pilotDef.SetTimeoutTime(0);
@@ -174,6 +181,7 @@ namespace Pilot_Fatigue
                     unitResult.pilot.pilotDef.PilotTags.Remove("PQ_pilot_green");
             }
         }
+
 
         //[HarmonyPatch(typeof(SimGameState))]
         //[HarmonyPatch("GetInjuryCost")]

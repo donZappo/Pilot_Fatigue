@@ -1,7 +1,7 @@
 {
     "Name": "Pilot Fatigue",
     "Enabled": true,
-    "Version": "4.0",
+    "Version": "7.0",
     "Description": "Adds Pilot Fatigue",
     "Author": "don Zappo and gnivler",
     "Website": "",
@@ -12,16 +12,15 @@
     "DLL": "Pilot_Fatigue.dll",
 	
 	"Settings": {
-		"FatigueTimeStart" : 7,
-		"StartingMorale" : 25,
-		"FatigueMinimum" : 0,
+		"FatigueTimeStart" : 6,
+		"FatigueMinimum" : 1,
 		"MoralePositiveTierOne" : 5,
 		"MoralePostiveTierTwo" : 15,
 		"MoraleNegativeTierOne" : -5,
 		"MoraleNegativeTierTwo" : -15,
 		"FatigueFactor" : 2.5,
 		"InjuriesHurt" : false,
-		"pilot_athletic_FatigueDaysReduction" : 0,
+		"pilot_athletic_FatigueDaysReduction" : 1.25,
 		"pilot_athletic_FatigueDaysReductionFactor" : 2,
 		"QuirksEnabled" : true,
 		"FatigueReducesResolve" : true,
@@ -29,5 +28,10 @@
 		"FatigueResolveFactor" : 2.5,
 		"FatigueCausesLowSpirits" : true,
 		"LowMoraleTime" : 14,
+		"LightInjuriesOn" : true,
+		"MaximumFatigueTime" : 14,
+		"AllowNegativeResolve" : false,
+		"pilot_wealthy_extra_fatigue" : 2,
+		"MechDamageMaxDays" : 5,
 	}
 }
