@@ -42,27 +42,38 @@ namespace Pilot_Fatigue
         [HarmonyPatch(typeof(SGBarracksRosterList), "SetSorting")]
         public static class SGBarracksRosterList_SetSorting_Patch
         {
-            private static HashSet<RectTransform> adjustedIcons = new HashSet<RectTransform>();
-
+            private static readonly HashSet<RectTransform> AdjustedIcons = new HashSet<RectTransform>();
+            private const float SizeDeltaFactor = 2;
+            private static readonly Vector2 AnchoredPositionOffset = new Vector2(6f, 35f);
+            
             public static void Postfix(SGBarracksRosterList __instance, Dictionary<string, SGBarracksRosterSlot> ___currentRoster)
             {
                 foreach (var pilot in ___currentRoster.Values)
                 {
                     var timeoutIcon = pilot.GetComponentsInChildren<RectTransform>(true)
                         .FirstOrDefault(x => x.name == "mw_TimeOutIcon");
-                    if (timeoutIcon != null && pilot.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                    if (timeoutIcon == null)
                     {
-                        if (adjustedIcons.Contains(timeoutIcon))
-                        {
-                            return;
-                        }
+                        return;
+                    }
 
+                    if (!AdjustedIcons.Contains(timeoutIcon))
+                    {
                         if (pilot.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
                         {
-                            adjustedIcons.Add(timeoutIcon);
+                            AdjustedIcons.Add(timeoutIcon);
                             // mw_TimeOutIcon (SVGImporter.SVGImage)
-                            timeoutIcon.sizeDelta /= 2;
-                            timeoutIcon.anchoredPosition += new Vector2(6f, 35f);
+                            timeoutIcon.sizeDelta /= SizeDeltaFactor;
+                            timeoutIcon.anchoredPosition += AnchoredPositionOffset;
+                        }
+                    }
+                    else
+                    {
+                        if (!pilot.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                        {
+                            AdjustedIcons.Remove(timeoutIcon);
+                            timeoutIcon.sizeDelta *= SizeDeltaFactor;
+                            timeoutIcon.anchoredPosition -= AnchoredPositionOffset;
                         }
                     }
                 }
