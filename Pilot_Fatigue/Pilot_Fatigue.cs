@@ -42,6 +42,8 @@ namespace Pilot_Fatigue
         [HarmonyPatch(typeof(SGBarracksRosterList), "SetSorting")]
         public static class SGBarracksRosterList_SetSorting_Patch
         {
+            private static HashSet<RectTransform> adjustedIcons = new HashSet<RectTransform>();
+
             public static void Postfix(SGBarracksRosterList __instance, Dictionary<string, SGBarracksRosterSlot> ___currentRoster)
             {
                 foreach (var pilot in ___currentRoster.Values)
@@ -50,8 +52,18 @@ namespace Pilot_Fatigue
                         .FirstOrDefault(x => x.name == "mw_TimeOutIcon");
                     if (timeoutIcon != null && pilot.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
                     {
-                        timeoutIcon.sizeDelta /= 2;
-                        timeoutIcon.anchoredPosition += new Vector2(6f, 35f);
+                        if (adjustedIcons.Contains(timeoutIcon))
+                        {
+                            return;
+                        }
+
+                        if (pilot.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
+                        {
+                            adjustedIcons.Add(timeoutIcon);
+                            // mw_TimeOutIcon (SVGImporter.SVGImage)
+                            timeoutIcon.sizeDelta /= 2;
+                            timeoutIcon.anchoredPosition += new Vector2(6f, 35f);
+                        }
                     }
                 }
 
