@@ -48,7 +48,7 @@ namespace Pilot_Fatigue
                 {
                     var timeoutIcon = pilot.GetComponentsInChildren<RectTransform>(true)
                         .FirstOrDefault(x => x.name == "mw_TimeOutIcon");
-                    if (timeoutIcon != null)
+                    if (timeoutIcon != null && pilot.Pilot.pilotDef.PilotTags.Contains("pilot_fatigued"))
                     {
                         timeoutIcon.sizeDelta /= 2;
                         timeoutIcon.anchoredPosition += new Vector2(6f, 35f);
@@ -70,7 +70,6 @@ namespace Pilot_Fatigue
                 }
                 else if (unitResult.pilot.pilotDef.TimeoutRemaining > 0 && unitResult.pilot.Injuries > 0)
                 {
-                    Helper.Logger.LogLine("Here");
                     unitResult.pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
                     unitResult.pilot.pilotDef.SetTimeoutTime(0);
                     WorkOrderEntry_MedBayHeal workOrderEntry_MedBayHeal;
