@@ -195,6 +195,9 @@ namespace Pilot_Fatigue
 
                     if (roll > GutCheck && (settings.LightInjuriesOn))
                     {
+                        if (settings.BEXCE && UnityGameInstance.BattleTechGame.Simulation.Constants.Story.MaximumDebt != 42)
+                            return;
+
                         unitResult.pilot.pilotDef.PilotTags.Add("pilot_lightinjury");
                         unitResult.pilot.pilotDef.PilotTags.Remove("pilot_fatigued");
                     }
@@ -553,6 +556,7 @@ namespace Pilot_Fatigue
             public bool AllowNegativeResolve = false;
             public int pilot_wealthy_extra_fatigue = 1;
             public int MechDamageMaxDays = 5;
+            public bool BEXCE = false;
         }
     }
 }
