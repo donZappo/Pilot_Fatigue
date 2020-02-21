@@ -195,7 +195,7 @@ namespace Pilot_Fatigue
 
                     if (roll > GutCheck && (settings.LightInjuriesOn))
                     {
-                        if (settings.BEXCE && UnityGameInstance.BattleTechGame.Simulation.Constants.Story.MaximumDebt != 42)
+                        if (settings.BEXCE && simstate.Constants.Story.MaximumDebt != 42)
                             return;
 
                         unitResult.pilot.pilotDef.PilotTags.Add("pilot_lightinjury");
