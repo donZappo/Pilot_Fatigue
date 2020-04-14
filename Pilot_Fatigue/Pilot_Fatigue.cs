@@ -148,9 +148,24 @@ namespace Pilot_Fatigue
                     (unitResult.mech.MechDefAssignedArmor + unitResult.mech.MechDefMaxStructure);
 
                 int MechDamageTime = (int)Math.Ceiling((1 - MechDamage) * settings.MechDamageMaxDays);
+                int argoReduction = 1;
+                var simState = Traverse.Create(__instance).Field("simState").GetValue<SimGameState>();
+
+                if (simState != null && settings.ArgoUpgradeReduction)
+                {
+                    var shipUpgrades = Traverse.Create(simState).Field("shipUpgrades").GetValue < List<ShipModuleUpgrade>>();
+                    if (shipUpgrades.Any(u => u.Tags.Any(t => t.Contains("argoUpgrade_rec_hydroponics"))))
+                        argoReduction++;
+                    if (shipUpgrades.Any(u => u.Tags.Any(t => t.Contains("argoUpgrade_rec_pool"))))
+                        argoReduction++;
+                    if (shipUpgrades.Any(u => u.Tags.Any(t => t.Contains("argoUpgrade_rec_arcade"))))
+                        argoReduction++;
+                }
+                var rand = new System.Random();
+                argoReduction = rand.Next(0, argoReduction);
 
                 //Calculate actual Fatigue Time for pilot.
-                int FatigueTime = FatigueTimeStart + MechDamageTime - GutsReduction - MoraleModifier;
+                int FatigueTime = FatigueTimeStart + MechDamageTime - GutsReduction - MoraleModifier - argoReduction;
 
                 if (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_athletic") && settings.QuirksEnabled)
                     FatigueTime = (int)Math.Ceiling(FatigueTime/settings.pilot_athletic_FatigueDaysReductionFactor) - settings.pilot_athletic_FatigueDaysReduction;
@@ -534,6 +549,7 @@ namespace Pilot_Fatigue
         }
         internal class ModSettings
         {
+            public bool ArgoUpgradeReduction = false;
             public int FatigueTimeStart = 7;
             public int MoraleModifier = 5;
             public int FatigueMinimum = 0;
