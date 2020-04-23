@@ -30,8 +30,9 @@ namespace Pilot_Fatigue
             {
                 settings = JsonConvert.DeserializeObject<ModSettings>(modSettings);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Helper.Logger.LogError(e);
                 settings = new ModSettings();
             }
 
