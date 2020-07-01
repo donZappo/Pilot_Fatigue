@@ -191,11 +191,10 @@ namespace Pilot_Fatigue
                 {
                     float roll = UnityEngine.Random.Range(1, 100);
                     float GutCheck = 5 * GutsValue;
-                    if (settings.QuirksEnabled && (unitResult.pilot.pilotDef.PilotTags.Contains("pilot_gladiator") || unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green")))
+                    if (settings.QuirksEnabled && unitResult.pilot.pilotDef.PilotTags.Contains("pilot_gladiator"))
                         GutCheck = GutCheck + 25;
                     if (unitResult.pilot.pilotDef.PilotTags.Contains("PQ_pilot_green"))
                         GutCheck = GutCheck + 25;
-
 
 
                     int currenttime = unitResult.pilot.pilotDef.TimeoutRemaining;
