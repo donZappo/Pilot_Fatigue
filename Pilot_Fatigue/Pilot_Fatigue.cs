@@ -495,6 +495,23 @@ namespace Pilot_Fatigue
             }
         }
         
+        //lock skills if they are reduced by fatigue or injury
+        [HarmonyPatch(typeof(SGBarracksAdvancementPanel), "SetPips")]
+        public static class SGBarracksAdvancementPanel_SetPips_prefix
+        {
+            //HarmonyPriority set to 100 to ensure prefix runs before Abilifier, because HarmonyBefore alone wasn't enough (likely due to Abilifier not having a HarmonyAfter annoation)
+            [HarmonyPriority(100)]
+            [HarmonyBefore(new string[] { "ca.gnivler.BattleTech.Abilifier" })]
+            public static void Prefix(Pilot ___curPilot, ref bool needsXP, ref bool isLocked)
+            {
+                if ((___curPilot.pilotDef.PilotTags.Contains("pilot_fatigued") && settings.FatigueReducesSkills) || (___curPilot.Injuries > 0 && settings.InjuriesHurt))
+                {
+                    needsXP = true;
+                    isLocked = true;
+                }
+            }
+        }
+
         public static class Helper
         {
             //public static Settings LoadSettings()
