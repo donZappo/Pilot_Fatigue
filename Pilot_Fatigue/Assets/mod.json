@@ -21,7 +21,7 @@
 		"FatigueFactor" : 2.5,
 		"InjuriesHurt" : false,
 		"pilot_athletic_FatigueDaysReduction" : 1,
-		"pilot_athletic_FatigueDaysReductionFactor" : 2.0,
+		"pilot_athletic_FatigueDaysReductionFactor" : 0.5,
 		"QuirksEnabled" : true,
 		"FatigueReducesResolve" : true,
 		"FatigueReducesSkills" : false,
