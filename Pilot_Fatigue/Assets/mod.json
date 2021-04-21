@@ -32,6 +32,6 @@
 		"MaximumFatigueTime" : 14,
 		"AllowNegativeResolve" : false,
 		"pilot_wealthy_extra_fatigue" : 2,
-		"MechDamageMaxDays" : 5,
+		"MechDamageMaxDays" : 5
 	}
 }
