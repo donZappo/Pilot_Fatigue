@@ -20,8 +20,8 @@
 		"MoraleNegativeTierTwo" : -15,
 		"FatigueFactor" : 2.5,
 		"InjuriesHurt" : false,
-		"pilot_athletic_FatigueDaysReduction" : 1.25,
-		"pilot_athletic_FatigueDaysReductionFactor" : 2,
+		"pilot_athletic_FatigueDaysReduction" : 1,
+		"pilot_athletic_FatigueDaysReductionFactor" : 0.5,
 		"QuirksEnabled" : true,
 		"FatigueReducesResolve" : true,
 		"FatigueReducesSkills" : false,
@@ -32,6 +32,6 @@
 		"MaximumFatigueTime" : 14,
 		"AllowNegativeResolve" : false,
 		"pilot_wealthy_extra_fatigue" : 2,
-		"MechDamageMaxDays" : 5,
+		"MechDamageMaxDays" : 5
 	}
 }

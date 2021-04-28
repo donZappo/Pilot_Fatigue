@@ -495,6 +495,37 @@ namespace Pilot_Fatigue
             }
         }
         
+        //lock skills if they are reduced by fatigue or injury
+        [HarmonyPatch(typeof(SGBarracksAdvancementPanel), "SetPips")]
+        public static class SGBarracksAdvancementPanel_SetPips_prefix
+        {
+        public static class SGBarracksAdvancementPanel_SetPips_Postfix
+        {
+            public static void Postfix(Pilot ___curPilot, SimGameState ___simState, List<SGBarracksSkillPip> pips, int originalSkill, int curSkill, int idx, bool isLocked)
+            {
+                if ((___curPilot.pilotDef.PilotTags.Contains("pilot_fatigued") && settings.FatigueReducesSkills) ||
+                    (settings.InjuriesHurt && (___curPilot.Injuries > 0 || ___curPilot.pilotDef.PilotTags.Contains("pilot_lightinjury"))))
+                {
+                    SGBarracksSkillPip.PurchaseState purchaseState = SGBarracksSkillPip.PurchaseState.Unselected;
+                    if (originalSkill > idx)
+                        purchaseState = SGBarracksSkillPip.PurchaseState.Purchased;
+                    else if (curSkill > idx)
+                        purchaseState = SGBarracksSkillPip.PurchaseState.Selected;
+                    bool flag = false;
+                    if (isLocked && (idx + 1 == pips.Count || curSkill == idx + 1))
+                        flag = true;
+                    if (pips[idx].Ability != null)
+                    {
+                        bool flag2 = ___simState.CanPilotTakeAbility(___curPilot.pilotDef, pips[idx].Ability, pips[idx].SecondTierAbility);
+                        bool flag3 = ___curPilot.pilotDef.abilityDefNames.Contains(pips[idx].Ability.Description.Id);
+                        pips[idx].Set(purchaseState, (curSkill == idx || curSkill == idx + 1) && !isLocked, curSkill == idx, true, isLocked && flag);
+                        pips[idx].SetActiveAbilityVisible(flag2 || flag3);
+                    }
+                    pips[idx].Set(purchaseState, (curSkill == idx || curSkill == idx + 1) && !isLocked, curSkill == idx, true, isLocked && flag);
+                }}
+            }
+        }
+
         public static class Helper
         {
             //public static Settings LoadSettings()
